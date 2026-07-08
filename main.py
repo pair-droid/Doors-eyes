@@ -46,15 +46,20 @@ async def cmd_spam(client: Client, message: Message):
         if count > 100:
             count = 100
             
-        # Удаляем свою команду .spam, чтобы не засорять переписку
-        await message.delete()
-        
+        # Сначала успешно спамим на максимальной скорости
         for _ in range(count):
             await client.send_message(message.chat.id, text)
-            await asyncio.sleep(0.2)  # Небольшая пауза против флуд-фильтров
+            await asyncio.sleep(0.05)  # Минимальная пауза для защиты твоего аккаунта от бана
+            
+        # Удаляем свою команду .spam только после успешного цикла
+        await message.delete()
             
     except Exception:
-        await message.edit_text("❌ Ошибка. Используй: <code>.spam 10 Текст</code>")
+        # Если в аргументах ошибка — безопасно изменяем текст сообщения команды
+        try:
+            await message.edit_text("❌ Ошибка. Используй: <code>.spam 10 Текст</code>")
+        except Exception:
+            pass
 
 # -------------------------------------------------------
 # МОНИТОРИНГ: Перехват измененных сообщений собеседника
